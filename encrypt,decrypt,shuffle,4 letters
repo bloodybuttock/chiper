@@ -1,0 +1,117 @@
+def caesar_encrypt(txt,shift):
+    a=str(txt)
+    b=int(shift)
+    
+    d=''
+    for i in a:
+        
+        if i.isalpha():
+            c1=int(ord(i)+b)
+            if i.isupper()== True:
+                if c1>90:
+                    c=chr(c1-26)
+                    d+=c
+
+                elif c1<65:
+                    c=chr(c1+26)
+                    d+=c
+                    
+                else:
+                    c=chr(c1)
+                    d+=c
+            elif i.islower() == True:
+                if c1>122:
+                    c=chr(c1-26)
+                    d+=c
+
+                elif c1<97:
+                    c=chr(c1+26)
+                    d+=c
+                
+                else:
+                    c=chr(c1)
+                    d+=c
+        else:
+            d+=i
+            
+    return d
+        
+def caesar_decrypt(cipher,shift):
+  return caesar_encrypt(cipher,-shift)
+
+
+
+def shuffle_order(txt,order):
+  return ''.join([txt[i] for i in order])
+ 
+
+def deshuffle_order(sftxt,order):
+    
+    from operator import itemgetter as itg
+    x=order
+    y=[]
+    
+    for i in sftxt:
+        y.append(i)
+
+    y2=tuple(zip(x,y))
+    
+    #y2.sort(key=lambda x:x[0])
+    z=sorted(y2, key=itg(0,1))
+    
+    xxx=[k[1] for k in z]
+    xyx=''
+    
+    for i in xxx:
+        xyx += i
+    
+    
+    return xyx
+
+
+import math
+
+def send_batch(txt,batch_order,shift=3):
+    import re
+    
+    caesar_encrypt(txt,shift)
+    a=list(caesar_encrypt(txt,shift))
+    #print(a)
+    new=''
+    for i in a:
+        new+=i
+
+    x=new.replace(' ','_')
+
+    #print(len(x))
+    
+    if (len(x)%4)!=0:
+        x+='_'
+    
+    #print(x)
+    
+    c=[x[i:i+shift] for i in range(0, len(x), shift)]
+
+    
+    #print(batch_order)
+    #print(c[1])
+
+    cx=[]
+    for i in range (len(c)):
+        xxc=deshuffle_order(c[i],batch_order)
+        cx.append(xxc)
+
+    return cx
+
+ 
+def receive_batch(batch_cpr,batch_order,shift=3):
+    batch_txt = [caesar_decrypt(deshuffle_order(i,batch_order),shift) for i in batch_cpr]
+    return ''.join(batch_txt).strip('_')
+
+
+A=caesar_encrypt('Talking to the machine is not so simple jon',3)
+B=shuffle_order('SaoS zAmbaL jon',[12,13,14,11,10,9,8,7,6,5,4,3,2,1,0])
+C=send_batch('Talking to the machine is not so simple jon',[2,1,3,0],4)
+D=receive_batch(A,[2,1,3,0])
+
+print(A,B,C,D,sep='\n')
